@@ -14,6 +14,15 @@ describe "Authentication" do
   describe "signin" do
     before { visit signin_path }
 
+    describe "guest user" do
+      before { click_button "Sign in" }
+
+      it { should_not have_link('Users') }
+      it { should_not have_link('Profile') }
+      it { should_not have_link('Settings') }
+      it { should_not have_link('Sign out') }
+    end
+    
     describe "with invalid information" do
       before { click_button "Sign in" }
 
@@ -41,8 +50,26 @@ describe "Authentication" do
         before { click_link "Sign out" }
         it { should have_link('Sign in') }
       end
+
     end
 
+    describe "redirect signed in users on new_user_path" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        sign_in user
+        get new_user_path
+      end
+      specify { response.should redirect_to(root_path) }
+    end
+
+    describe "redirect signed in users on POST to users_path" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        sign_in user
+        post users_path
+      end
+      specify { response.should redirect_to(root_path) }
+    end
   end
 
   describe "authorization" do

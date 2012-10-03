@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   before_filter :signed_in_user, only: [:edit, :update, :index, :destroy]
   before_filter :correct_user,   only: [:edit, :update]
   before_filter :admin_user,     only: :destroy
+  before_filter :guest_user,     only: [:new, :create]
 
   def new
     @user = User.new
@@ -51,6 +52,12 @@ class UsersController < ApplicationController
       unless signed_in?
         store_location
         redirect_to signin_url, notice: "Please sign in."
+      end
+    end
+  
+    def guest_user
+      if signed_in?
+        redirect_to root_path
       end
     end
   
